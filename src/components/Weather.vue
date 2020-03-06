@@ -2,8 +2,10 @@
  <div >
   <h1 class="heading">City Temperature App</h1>
  <div class="container">
-   <input v-model="cityName" v-on:keyup.enter="location" type="text" placeholder="Enter city name and press ENTER" >
-   <p v-if="errorVisible">Enter correct city name</p>
+   <input @input="hideError" v-model="cityName" v-on:keyup.enter="location" type="text" placeholder="Enter city name and press ENTER e.g. Bengaluru" >
+   <br>
+   <img class="loader" v-if="loading" src="ajax-loader.gif" alt="">
+   <p class="error" v-if="errorVisible">Enter correct city name</p>
    <div v-if="currentTemp">
    <h3>Current Temperature: {{currentTemp}}&#8451;</h3>
    <h3>Minimum Temperature: {{minTemp}}&#8451;</h3>
@@ -21,7 +23,8 @@ export default {
     currentTemp:"",
     minTemp:"",
     maxTemp:"",
-    errorVisible:false
+    errorVisible:false,
+    loading:false
 
 
   }),
@@ -30,10 +33,12 @@ methods:{
       if(this.cityName == ""){
         return;
       }
-
+      this.loading = true
+      this.currentTemp = ""
       fetch(`https://api.openweathermap.org/data/2.5/weather?q=${this.cityName}&appid=fa339877f417838d562d1bd41219bf30&units=metric`)
         .then((response) => { return response.json() })
         .then((response) => {
+          this.loading = false
           if(response.main){
 
           
@@ -49,6 +54,9 @@ methods:{
           
            console.log(response)
         })
+    },
+    hideError(){
+      this.errorVisible = false
     }
       	
       },
@@ -89,4 +97,11 @@ input{
 h1{
 color:black;	
 }
+.error{
+  color: red;
+}
+.loader{
+  margin-top: 20px;
+}
+
 </style>
